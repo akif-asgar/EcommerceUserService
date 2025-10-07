@@ -6,3 +6,5 @@ venv/
 .env/
 staticfiles/
 media/
+Pipfile
+Pipfile.lock

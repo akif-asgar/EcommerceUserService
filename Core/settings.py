@@ -152,4 +152,13 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),                  
 }
 
+# Email configuration
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER ='maestrouser775@gmail.com'
+EMAIL_HOST_PASSWORD ='snxz etxf fbuf zfha'
 
+# Frontend URL for password reset
+FRONTEND_PASSWORD_RESET_URL = 'http://127.0.0.1:3000/reset-password'

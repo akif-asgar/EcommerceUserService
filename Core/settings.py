@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-cxa4o9g=4p#rh+hnx1tn1i=gu#qa+k-vsma^&f4bwf-@gcq+q4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -78,13 +78,19 @@ WSGI_APPLICATION = 'Core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
+import os
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'ecommerce_db'),
+        'USER': os.getenv('POSTGRES_USER', 'ecommerce_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'StrongPass123!'),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

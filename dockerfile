@@ -8,6 +8,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y build-essential libpq-dev curl && \
     pip install --upgrade pip && pip install poetry
 
+RUN pip install --no-cache-dir python-dotenv
+
 # Copy lock və pyproject faylları
 COPY uv.lock pyproject.toml ./
 

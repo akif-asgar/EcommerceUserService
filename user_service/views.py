@@ -7,6 +7,8 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
+from Core.authentication import GatewayHeaderAuthentication
+from .services import create_user_and_notify
 
 from .serializers import (
     UserSerializer, 
@@ -23,12 +25,16 @@ token_generator = PasswordResetTokenGenerator()
 #  Register 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
-    permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+
+        user = create_user_and_notify(
+            email=serializer.validated_data['email'],
+            password=serializer.validated_data['password']
+        )
+
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data
         }, status=status.HTTP_201_CREATED)
@@ -38,21 +44,20 @@ class RegisterView(generics.CreateAPIView):
 
 class LoginView(APIView):
     serializer_class = LoginSerializer
-    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         return Response({
-            "user": UserSerializer(user).data
+            "uuid": str(user.id),
+            "email": user.email
         }, status=status.HTTP_200_OK)
 
 
 
 #  Logout 
 class LogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         # JWT blacklisting artıq servisdə yoxdursa, sadəcə cavab qaytara bilərsən
@@ -61,6 +66,7 @@ class LogoutView(APIView):
 
 # User Profile
 class UserProfileView(APIView):
+    authentication_classes = [GatewayHeaderAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -84,7 +90,8 @@ class UserProfileView(APIView):
 
 # Password Reset Request
 class PasswordResetRequestView(APIView):
-    permission_classes = [permissions.AllowAny]
+    authentication_classes = [GatewayHeaderAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
@@ -121,7 +128,6 @@ Maestro komandası
 
 # Password Reset Confirm
 class PasswordResetConfirmView(APIView):
-    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)

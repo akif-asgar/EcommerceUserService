@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     #appps
     'user_service',
     #installed
+    'drf_spectacular',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
 
@@ -78,30 +79,19 @@ WSGI_APPLICATION = 'Core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# database settings using environment variables
+
 import os
-from pathlib import Path
-from dotenv import load_dotenv
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env')  # mütləq bu sətir olmalıdır!
-
-SECRET_KEY = os.getenv('SECRET_KEY', 'fallback_secret_key')
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),  # burada "db" gəlməlidir
-        'PORT': os.getenv('POSTGRES_PORT', 5432),
+        'NAME': os.getenv('POSTGRES_DB', 'ecommerce_db'),
+        'USER': os.getenv('POSTGRES_USER', 'ecommerce_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'StrongPass123!'),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -150,11 +140,10 @@ AUTH_USER_MODEL = 'user_service.User' # Custom user model
 # Django Rest Framework and JWT settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'Core.authentication.GatewayHeaderAuthentication',
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    )
+    
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 from datetime import timedelta
@@ -179,3 +168,17 @@ EMAIL_HOST_PASSWORD ='snxz etxf fbuf zfha'
 
 # Frontend URL for password reset
 FRONTEND_PASSWORD_RESET_URL = 'http://127.0.0.1:3000/reset-password'
+
+# Swagger settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'USER API',
+    'DESCRIPTION': 'API documentation',
+    'VERSION': '1.0.0',
+}
+
+
+# Celery Configuration
+import os
+
+CELERY_BROKER_URL = os.getenv('RABBITMQ_URL', 'amqp://ecommerce_user:StrongPass123!@rabbitmq:5672/')
+CELERY_RESULT_BACKEND = 'rpc://'

@@ -1,0 +1,21 @@
+http:
+  middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+  routers:
+    web-router:
+      rule: "Host(`${DOMAIN_NAME}`)"
+      entryPoints:
+        - web
+      service: web-service
+      tls:
+        certResolver: myresolver
+
+  services:
+    web-service:
+      loadBalancer:
+        servers:
+          - url: "http://web:8000"

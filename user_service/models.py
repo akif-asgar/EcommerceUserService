@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.utils.text import slugify
 
 class User(AbstractUser):
+    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # <-- burada UUID
     first_name = models.CharField(max_length=30, null=False)
     last_name = models.CharField(max_length=30, null=False)
